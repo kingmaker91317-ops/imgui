@@ -30,6 +30,7 @@ android {
 
     sourceSets {
         main {
+            java.srcDirs = ['src/main/jni/LazXcheat']
             jniLibs.srcDirs = ['src/main/libs']
         }
     }
@@ -37,4 +38,5 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
+    implementation 'com.github.topjohnwu.libsu:core:5.0.5'
 }

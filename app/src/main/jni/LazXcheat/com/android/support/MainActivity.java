@@ -53,14 +53,33 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        makabasa.setAction(Intent.ACTION_VIEW);
-        makabasa = getPackageManager().getLaunchIntentForPackage("com.dts.freefireth");
-        startActivity(makabasa);
-     if (InjectRoot("libmain.so")) {
-     Toast.makeText(getApplicationContext(), "INJECT SUCCESS", Toast.LENGTH_LONG).show();
-     DeletedCMODs("libmain.so");                                           
+
+        try {
+            Intent ffIntent = getPackageManager().getLaunchIntentForPackage("com.dts.freefireth");
+            if (ffIntent != null) {
+                startActivity(ffIntent);
+            } else {
+                Toast.makeText(getApplicationContext(), "Free Fire is not installed!", Toast.LENGTH_SHORT).show();
             }
-        };    
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                if (InjectRoot("liblion.so")) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getApplicationContext(), "INJECT SUCCESS", Toast.LENGTH_LONG).show();
+                        }
+                    });
+                    DeletedCMODs("liblion.so");
+                }
+            }
+        }).start();
+    }    
     private boolean InjectRoot(String Lib) {
         try {
             String target = "com.dts.freefireth";
@@ -243,10 +262,10 @@ public class MainActivity extends Activity {
 
     public static void moveFile(String sourcePath, String destPath) {
         copyFile(sourcePath, destPath);
-        deleteFile(sourcePath);
+        deleteFilePath(sourcePath);
     }
 
-    public static void deleteFile(String path) {
+    public static void deleteFilePath(String path) {
         File file = new File(path);
 
         if (!file.exists()) return;
@@ -261,7 +280,7 @@ public class MainActivity extends Activity {
         if (fileArr != null) {
             for (File subFile : fileArr) {
                 if (subFile.isDirectory()) {
-                    deleteFile(subFile.getAbsolutePath());
+                    deleteFilePath(subFile.getAbsolutePath());
                 }
 
                 if (subFile.isFile()) {
