@@ -1,0 +1,72 @@
+// ZYGISK CONFIG
+
+using zygisk::Api;
+using zygisk::AppSpecializeArgs;
+using zygisk::ServerSpecializeArgs;
+
+void hack();
+
+class MyModule : public zygisk::ModuleBase {
+ public:
+  void onLoad(Api *api, JNIEnv *env) override {
+    this->api_ = api;
+    this->env_ = env;
+    genv = env;
+  }
+  void preAppSpecialize(AppSpecializeArgs *args) override {
+    static constexpr const char *packages[] = {
+      "com.dts.freefireth","com.dts.freefiremax"
+    }; // GAME PACKAGE NAMES
+    const char *process = env_->GetStringUTFChars(args->nice_name, nullptr);
+    for (const auto *package: packages) {
+      is_game_ = (strcmp(process, package) == 0);
+      if (is_game_) {
+        break;
+      }
+    }
+    env_->ReleaseStringUTFChars(args->nice_name, process);
+  }
+  void postAppSpecialize(const AppSpecializeArgs *args) override {
+    if (is_game_) {
+       genv->GetJavaVM(&jvm);
+      std::thread{hack}.detach();
+    }
+  }
+ private:
+  Api *api_ = nullptr;
+  JNIEnv *env_ = nullptr;
+  bool is_game_ = false;
+};
+
+
+
+
+REGISTER_ZYGISK_MODULE(MyModule)
+
+
+
+
+// JNI CONFIG
+
+extern JavaVM* jvm;
+extern JNIEnv* genv;
+
+void hack();
+void hack_thread(pid_t pid);
+
+extern "C" JNIEXPORT jint JNICALL
+JNI_OnLoad(JavaVM* vm, void *key)
+{
+    if (key != (void*)1337)
+        return JNI_VERSION_1_6;
+
+    jvm = vm;
+
+    JNIEnv* env = nullptr;
+    if (vm->GetEnv((void**)&env, JNI_VERSION_1_6) == JNI_OK)
+        genv = env;
+
+    std::thread(hack).detach();
+
+    return JNI_VERSION_1_6;
+}

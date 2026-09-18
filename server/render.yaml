@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: lion-key-auth-server
+    env: node
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: ADMIN_KEY
+        generateValue: true
