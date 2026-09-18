@@ -56,10 +56,13 @@ public class MainActivity extends Activity {
 
         try {
             Intent ffIntent = getPackageManager().getLaunchIntentForPackage("com.dts.freefireth");
+            if (ffIntent == null) {
+                ffIntent = getPackageManager().getLaunchIntentForPackage("com.dts.freefiremax");
+            }
             if (ffIntent != null) {
                 startActivity(ffIntent);
             } else {
-                Toast.makeText(getApplicationContext(), "Free Fire is not installed!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Free Fire or Free Fire MAX is not installed!", Toast.LENGTH_SHORT).show();
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -83,6 +86,9 @@ public class MainActivity extends Activity {
     private boolean InjectRoot(String Lib) {
         try {
             String target = "com.dts.freefireth";
+            if (Utils.getProcessID(target) <= 0) {
+                target = "com.dts.freefiremax";
+            }
             String injector = this.getApplicationInfo().nativeLibraryDir + File.separator + "libcatchmeifyoucan.so";
             String payload_source = this.getApplicationInfo().nativeLibraryDir + File.separator + Lib;
             String payload_dest = "/dev/"+Lib;
