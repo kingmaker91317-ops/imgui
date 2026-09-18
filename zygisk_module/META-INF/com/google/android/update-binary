@@ -1,0 +1,25 @@
+#!/sbin/sh
+##########################################################################################
+# Magisk Module Installer Script
+##########################################################################################
+
+OIFS=$IFS
+IFS=$'\n'
+
+# Find zip path
+ZIPFILE="$2"
+
+# Unzip module files
+mkdir -p /data/local/tmp/lion_module
+unzip -o "$ZIPFILE" -d /data/local/tmp/lion_module
+
+# Delegate to magisk installer if present
+if [ -f /data/adb/magisk/util_functions.sh ]; then
+    . /data/adb/magisk/util_functions.sh
+    install_module
+else
+    echo "- Installing module files..."
+fi
+
+rm -rf /data/local/tmp/lion_module
+exit 0
