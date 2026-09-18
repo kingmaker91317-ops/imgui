@@ -188,6 +188,10 @@ app.post('/api/admin/delete-key', adminAuth, async (req, res) => {
 });
 
 // Serve Admin Panel
+app.get('/', (req, res) => {
+    res.redirect('/admin');
+});
+
 app.get('/admin', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });
